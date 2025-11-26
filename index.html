@@ -22,7 +22,6 @@
             --ac-blue: #4FB5D9;
             --ac-dark: #58504A;
             --ac-card-border: #E6E0C8;
-            /* 額外主題色（會在 JS 切換 class） */
             --kawaii-pink: #FFD3E2;
             --energetic-orange: #FFD58A;
         }
@@ -37,7 +36,6 @@
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: var(--ac-green);
-            /* 背景圖片（dog.png）與原本斜紋疊加 */
             background-image:
                 url('./dog.png'),
                 repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255, 255, 255, 0.15) 20px, rgba(255, 255, 255, 0.15) 40px);
@@ -50,7 +48,6 @@
             padding-bottom: 20px;
         }
 
-        /* 主題：light 淺色 (預設)、kawaii 可愛、energetic 活力 */
         body.theme-light {
             --ac-green: #7DE1A9;
             --ac-cream: #FFFEF2;
@@ -103,15 +100,19 @@
             gap: 12px;
         }
 
-        .location-pill {
-            background: var(--ac-yellow);
-            color: var(--ac-brown);
-            padding: 5px 12px;
+        /* location select 樣式，保留原 pill 感覺 */
+        .location-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 6px 12px;
             border-radius: 20px;
+            border: 2px solid white;
             font-weight: 900;
             font-size: 1.05rem;
+            background: var(--ac-yellow);
+            color: var(--ac-brown);
             transform: rotate(-2deg);
-            border: 2px solid white;
+            cursor: pointer;
             box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
         }
 
@@ -163,13 +164,11 @@
             opacity: 0.2; /* 預設 20% */
         }
 
-        /* 當滑鼠懸停在父容器或個別卡片時提升透明度（滑鼠在 hero-card 上） */
         .hero-card:hover,
         .mini-card:hover {
             opacity: 1;
         }
 
-        /* 也支援當滑鼠 hover 在整個可互動區域時，讓三個區塊呈現 100%（於 JS 補強） */
         .interactive-hover .hero-card,
         .interactive-hover .mini-card {
             opacity: 0.2;
@@ -380,7 +379,31 @@
 
     <div class="status-bar">
         <div class="left-group">
-            <div class="location-pill">📍 屏東縣</div>
+            <!-- 將靜態地名改為下拉式選單，內含 22 個地區 -->
+            <select id="locationSelect" class="location-select" aria-label="選擇地區">
+                <option value="宜蘭縣">📍 宜蘭縣</option>
+                <option value="花蓮縣">📍 花蓮縣</option>
+                <option value="臺東縣">📍 臺東縣</option>
+                <option value="澎湖縣">📍 澎湖縣</option>
+                <option value="金門縣">📍 金門縣</option>
+                <option value="連江縣">📍 連江縣</option>
+                <option value="臺北市">📍 臺北市</option>
+                <option value="新北市">📍 新北市</option>
+                <option value="桃園市">📍 桃園市</option>
+                <option value="臺中市">📍 臺中市</option>
+                <option value="臺南市">📍 臺南市</option>
+                <option value="高雄市">📍 高雄市</option>
+                <option value="基隆市">📍 基隆市</option>
+                <option value="新竹縣">📍 新竹縣</option>
+                <option value="新竹市">📍 新竹市</option>
+                <option value="苗栗縣">📍 苗栗縣</option>
+                <option value="彰化縣">📍 彰化縣</option>
+                <option value="南投縣">📍 南投縣</option>
+                <option value="雲林縣">📍 雲林縣</option>
+                <option value="嘉義縣">📍 嘉義縣</option>
+                <option value="嘉義市">📍 嘉義市</option>
+                <option value="屏東縣" selected>📍 屏東縣</option>
+            </select>
         </div>
 
         <div class="right-group">
@@ -406,7 +429,8 @@
     </div>
 
     <script>
-        const API_URL = "https://weather-kelvin2.zeabur.app/api/weather/kelvin";
+        // 注意：當地區字串放入 URL 必須做 URL 編碼 (encodeURIComponent)
+        const BASE_API_URL = "https://weather-kelvin2.zeabur.app/api/weather/kelvin";
 
         // 主題切換（light 淺色 / kawaii 可愛 / energetic 活力）
         const themeSelect = document.getElementById('themeSelect');
@@ -471,10 +495,8 @@
         }
         updateDatePill();
 
-        // 控制滑鼠經過時透明度行為（因為要求：當游標在任一三個天氣區塊時，該區塊透明度 100%，否則 20%）
-        // 我們已在 CSS 設定單張卡 hover 行為，這裡再加強：當滑鼠移到任一卡片時，加上 hovered class，移開時移除。
+        // 控制滑鼠經過時透明度行為
         function attachHoverBehavior() {
-            // 包含主卡與所有 mini-card
             const container = document.getElementById('mainContent');
             container.addEventListener('mouseover', (e) => {
                 const card = e.target.closest('.hero-card, .mini-card');
@@ -501,7 +523,7 @@
                     <div class="hero-period">${period}</div>
                     <div class="hero-temp-container">
                         <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
-                        <div class="hero-temp">${avgTemp}°</div>
+                        <div class="hero-temp">${avgTemp}°C</div>
                     </div>
                     <div class="hero-desc">${current.weather}</div>
 
@@ -514,7 +536,7 @@
                         <div class="advice-item">
                             <div class="advice-icon">${advice.clothIcon}</div>
                             <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
+                            <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}</div>
                         </div>
                     </div>
                 </div>
@@ -538,7 +560,7 @@
                     <div class="mini-card">
                         <div class="mini-time">${p}</div>
                         <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
-                        <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
+                        <div class="mini-temp">${f.minTemp} - ${f.maxTemp}</div>
                         <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
                     </div>
                 `;
@@ -548,16 +570,20 @@
             updateDatePill();
         }
 
-        async function fetchWeather() {
+        // 取得目前下拉選單值，並呼叫 API（location 要做 encodeURIComponent）
+        async function fetchWeatherFor(location) {
+            const encoded = encodeURIComponent(location);
+            const url = `${BASE_API_URL}?location=${encoded}`;
+
             try {
+                // 與原行為一致保留 1.5s loading 效果
                 const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
-                const fetchPromise = fetch(API_URL).then(res => res.json());
+                const fetchPromise = fetch(url).then(res => res.json());
                 const [_, json] = await Promise.all([delayPromise, fetchPromise]);
 
                 if (json.success) {
                     renderWeather(json.data);
                     attachHoverBehavior();
-                    // 顯示主畫面
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                 } else {
@@ -569,7 +595,20 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", fetchWeather);
+        // 當選擇改變時呼叫 fetchWeatherFor 並更新 UI
+        const locationSelect = document.getElementById('locationSelect');
+        locationSelect.addEventListener('change', (e) => {
+            // 顯示 loading，隱藏內容（與初次行為一致）
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            fetchWeatherFor(e.target.value);
+        });
+
+        // 初次載入：使用選單的預設值（預設為 屏東縣）
+        document.addEventListener("DOMContentLoaded", () => {
+            const initialLocation = locationSelect.value || "屏東縣";
+            fetchWeatherFor(initialLocation);
+        });
     </script>
 </body>
 
