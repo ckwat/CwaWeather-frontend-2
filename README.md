@@ -123,9 +123,3 @@ https://weather-kelvin2.zeabur.app/api/weather/kelvin?location=%E5%B1%8F%E6%9D%B
 ### 常見問題排查
 - 若天氣資料載入失敗，檢查瀏覽器主控台的 network 與錯誤訊息，確認後端 URL 是否正確且可連線。
 - 若圖片或字型無法顯示，請確認檔案路徑與權限設置。
-
----
-
-如果你需要，我可以：
-- 幫你把這份 README 加入部署與建置指令（例如如何在 Zeabur 上設定靜態網站或如何在本地測試）。
-- 或者將 README 變成純繁中或純英文版本（目前是雙語）。
